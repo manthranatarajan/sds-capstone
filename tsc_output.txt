@@ -1,0 +1,12 @@
+src/components/TicketModal.tsx(2,34): error TS6133: 'AlertCircle' is declared but its value is never read.
+src/components/TicketModal.tsx(4,10): error TS1484: 'Ticket' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/components/TicketModal.tsx(4,10): error TS6133: 'Ticket' is declared but its value is never read.
+src/components/TicketModal.tsx(4,18): error TS1484: 'Priority' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/components/TicketModal.tsx(4,28): error TS1484: 'Status' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/components/TicketModal.tsx(5,1): error TS6133: 'clsx' is declared but its value is never read.
+src/pages/Board.tsx(9,5): error TS1484: 'DragStartEvent' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/pages/Board.tsx(10,5): error TS1484: 'DragOverEvent' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/pages/Board.tsx(11,5): error TS1484: 'DragEndEvent' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/pages/Board.tsx(16,10): error TS1484: 'Status' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/pages/Sprints.tsx(6,1): error TS6133: 'TicketModal' is declared but its value is never read.
+src/pages/Sprints.tsx(10,12): error TS6133: 'showCreateModal' is declared but its value is never read.
