@@ -3,14 +3,24 @@ import { useStore } from '../../store/store';
 import { CheckCircle2, Circle, Clock, AlertOctagon } from 'lucide-react';
 
 const TicketSummary: React.FC = () => {
-    const { tickets } = useStore();
+    const { tickets, users, searchQuery } = useStore();
+
+    const normalizedQuery = searchQuery?.trim().toLowerCase() ?? '';
+    const filteredTickets = normalizedQuery
+        ? tickets.filter((t) => {
+              const assigneeName = users.find((u) => u.id === t.assigneeId)?.name ?? '';
+              const creatorName = users.find((u) => u.id === (t as any).createdBy)?.name ?? '';
+              const hay = `${t.title} ${t.description ?? ''} ${t.tags?.join(' ') ?? ''} ${t.id} ${assigneeName} ${creatorName}`.toLowerCase();
+              return hay.includes(normalizedQuery);
+          })
+        : tickets;
 
     const counts = {
-        total: tickets.length,
-        done: tickets.filter((t) => t.status === 'done').length,
-        inProgress: tickets.filter((t) => t.status === 'in-progress' || t.status === 'in-review').length,
-        todo: tickets.filter((t) => t.status === 'todo' || t.status === 'backlog').length,
-        highPriority: tickets.filter((t) => t.priority === 'high').length,
+        total: filteredTickets.length,
+        done: filteredTickets.filter((t) => t.status === 'done').length,
+        inProgress: filteredTickets.filter((t) => t.status === 'in-progress' || t.status === 'in-review').length,
+        todo: filteredTickets.filter((t) => t.status === 'todo' || t.status === 'backlog').length,
+        highPriority: filteredTickets.filter((t) => t.priority === 'high').length,
     };
 
     return (

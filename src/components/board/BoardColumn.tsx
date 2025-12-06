@@ -8,9 +8,11 @@ interface BoardColumnProps {
     id: Status;
     title: string;
     tickets: Ticket[];
+    onEditTicket?: (ticket: Ticket) => void;
+    onDeleteTicket?: (ticketId: string) => void;
 }
 
-const BoardColumn: React.FC<BoardColumnProps> = ({ id, title, tickets }) => {
+const BoardColumn: React.FC<BoardColumnProps> = ({ id, title, tickets, onEditTicket, onDeleteTicket }) => {
     const { setNodeRef } = useDroppable({
         id,
         data: { type: 'Column', status: id },
@@ -32,7 +34,12 @@ const BoardColumn: React.FC<BoardColumnProps> = ({ id, title, tickets }) => {
             <div ref={setNodeRef} className="flex-1 p-3 overflow-y-auto space-y-3 min-h-[150px]">
                 <SortableContext items={ticketIds} strategy={verticalListSortingStrategy}>
                     {tickets.map((ticket) => (
-                        <TicketCard key={ticket.id} ticket={ticket} />
+                        <TicketCard 
+                            key={ticket.id} 
+                            ticket={ticket}
+                            onEdit={onEditTicket}
+                            onDelete={onDeleteTicket}
+                        />
                     ))}
                 </SortableContext>
 

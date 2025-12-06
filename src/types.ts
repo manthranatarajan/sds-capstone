@@ -17,7 +17,8 @@ export interface Ticket {
     sprintId?: string;
     tags: string[];
     createdAt: string; // ISO date string
-    dueDate?: string; // ISO date string
+    createdBy?: string; // user id who created the ticket
+    dueDate?: string; // Date-only string in `YYYY-MM-DD` format
 }
 
 export interface Sprint {

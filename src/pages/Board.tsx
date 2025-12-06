@@ -11,16 +11,23 @@ import {
 import type { DragStartEvent, DragOverEvent, DragEndEvent } from '@dnd-kit/core';
 import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { useStore } from '../store/store';
-import type { Status } from '../types';
+import type { Status, Ticket } from '../types';
 import BoardColumn from '../components/board/BoardColumn';
 import TicketCard from '../components/board/TicketCard';
+import TicketModal from '../components/TicketModal';
 
 const Board: React.FC = () => {
-    const { tickets, moveTicket } = useStore();
+    const { tickets, moveTicket, deleteTicket, searchQuery, users } = useStore();
     const [activeTicket, setActiveTicket] = useState<any>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingTicket, setEditingTicket] = useState<Ticket | null>(null);
 
     const sensors = useSensors(
-        useSensor(PointerSensor),
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                distance: 8,
+            },
+        }),
         useSensor(KeyboardSensor, {
             coordinateGetter: sortableKeyboardCoordinates,
         })
@@ -33,6 +40,16 @@ const Board: React.FC = () => {
         { id: 'in-review', title: 'In Review' },
         { id: 'done', title: 'Done' },
     ];
+
+    const normalizedQuery = searchQuery?.trim().toLowerCase() ?? '';
+    const filteredTickets = normalizedQuery
+        ? tickets.filter((t) => {
+              const assigneeName = users.find((u) => u.id === t.assigneeId)?.name ?? '';
+              const creatorName = users.find((u) => u.id === (t as any).createdBy)?.name ?? '';
+              const hay = `${t.title} ${t.description ?? ''} ${t.tags?.join(' ') ?? ''} ${t.id} ${assigneeName} ${creatorName}`.toLowerCase();
+              return hay.includes(normalizedQuery);
+          })
+        : tickets;
 
     const handleDragStart = (event: DragStartEvent) => {
         const { active } = event;
@@ -96,6 +113,20 @@ const Board: React.FC = () => {
         setActiveTicket(null);
     };
 
+    const handleEditTicket = (ticket: Ticket) => {
+        setEditingTicket(ticket);
+        setIsModalOpen(true);
+    };
+
+    const handleDeleteTicket = (ticketId: string) => {
+        deleteTicket(ticketId);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setEditingTicket(null);
+    };
+
     return (
         <div className="h-full flex flex-col">
             <div className="flex items-center justify-between mb-6">
@@ -118,7 +149,9 @@ const Board: React.FC = () => {
                             key={column.id}
                             id={column.id}
                             title={column.title}
-                            tickets={tickets.filter((t) => t.status === column.id)}
+                            tickets={filteredTickets.filter((t) => t.status === column.id)}
+                            onEditTicket={handleEditTicket}
+                            onDeleteTicket={handleDeleteTicket}
                         />
                     ))}
                 </div>
@@ -127,6 +160,12 @@ const Board: React.FC = () => {
                     {activeTicket ? <TicketCard ticket={activeTicket} /> : null}
                 </DragOverlay>
             </DndContext>
+
+            <TicketModal 
+                isOpen={isModalOpen} 
+                onClose={handleCloseModal}
+                ticketId={editingTicket?.id}
+            />
         </div>
     );
 };

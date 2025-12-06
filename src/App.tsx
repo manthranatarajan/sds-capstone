@@ -4,6 +4,7 @@ import Dashboard from './pages/Dashboard';
 import Board from './pages/Board';
 import Calendar from './pages/Calendar';
 import Sprints from './pages/Sprints';
+import Settings from './pages/Settings';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route path="/board" element={<Board />} />
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/sprints" element={<Sprints />} />
+          <Route path="/settings" element={<Settings />} />
           <Route path="*" element={<Dashboard />} />
         </Routes>
       </Layout>

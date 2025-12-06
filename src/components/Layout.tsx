@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, KanbanSquare, Calendar, Layers, Settings, Bell, Search, User } from 'lucide-react';
+import { LayoutDashboard, KanbanSquare, Calendar, Layers, Settings, Search } from 'lucide-react';
 import clsx from 'clsx';
 import { useStore } from '../store/store';
 import TicketModal from './TicketModal';
+import ProfileDropdown from './ProfileDropdown';
+import AlertsDropdown from './AlertsDropdown';
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const { alerts } = useStore();
+    const { alerts, searchQuery, setSearchQuery } = useStore();
     const unreadAlerts = alerts.length;
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -48,6 +50,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                             </div>
                             <input
                                 type="text"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
                                 className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition duration-150 ease-in-out"
                                 placeholder="Search tickets, sprints, or people..."
                             />
@@ -55,15 +59,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                     </div>
 
                     <div className="flex items-center space-x-4">
-                        <button className="relative p-2 text-gray-400 hover:text-gray-500 focus:outline-none">
-                            <Bell size={20} />
-                            {unreadAlerts > 0 && (
-                                <span className="absolute top-1.5 right-1.5 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
-                            )}
-                        </button>
-                        <div className="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center border border-indigo-200 text-indigo-700 font-medium">
-                            <User size={18} />
-                        </div>
+                        <AlertsDropdown />
+                        <ProfileDropdown />
                         <button
                             onClick={() => setIsModalOpen(true)}
                             className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors"

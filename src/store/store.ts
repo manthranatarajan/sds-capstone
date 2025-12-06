@@ -7,6 +7,8 @@ interface AppState {
     sprints: Sprint[];
     alerts: Alert[];
     users: User[];
+    currentUserId: string;
+    searchQuery: string;
 
     // Actions
     addTicket: (ticket: Omit<Ticket, 'id' | 'createdAt'>) => void;
@@ -19,6 +21,8 @@ interface AppState {
 
     addAlert: (alert: Omit<Alert, 'id' | 'timestamp'>) => void;
     clearAlert: (id: string) => void;
+    setCurrentUser: (userId: string) => void;
+    setSearchQuery: (q: string) => void;
 }
 
 // Mock Data
@@ -112,10 +116,22 @@ export const useStore = create<AppState>((set) => ({
     sprints: MOCK_SPRINTS,
     alerts: MOCK_ALERTS,
     users: MOCK_USERS,
+    currentUserId: 'u1',
+    searchQuery: '',
 
-    addTicket: (ticket) => set((state) => ({
-        tickets: [...state.tickets, { ...ticket, id: Math.random().toString(36).substr(2, 9), createdAt: new Date().toISOString() }]
-    })),
+    addTicket: (ticket) => set((state) => {
+        const id = Math.random().toString(36).substr(2, 9);
+        const newTicket: Ticket = { ...ticket, id, createdAt: new Date().toISOString(), createdBy: state.currentUserId } as Ticket;
+        const creator = state.users.find(u => u.id === state.currentUserId);
+        const alertTitle = creator ? `New ticket by ${creator.name}` : 'New ticket created';
+        const alertMessage = `${ticket.title} — Priority: ${ticket.priority} — ${id}`;
+        const newAlert: Alert = { id: Math.random().toString(36).substr(2, 9), title: alertTitle, message: alertMessage, type: 'info', timestamp: new Date().toISOString() };
+
+        return {
+            tickets: [...state.tickets, newTicket],
+            alerts: [newAlert, ...state.alerts]
+        };
+    }),
 
     updateTicket: (id, updates) => set((state) => ({
         tickets: state.tickets.map((t) => (t.id === id ? { ...t, ...updates } : t))
@@ -147,4 +163,9 @@ export const useStore = create<AppState>((set) => ({
     clearAlert: (id) => set((state) => ({
         alerts: state.alerts.filter((a) => a.id !== id)
     })),
+
+    setCurrentUser: (userId) => set(() => ({
+        currentUserId: userId
+    })),
+    setSearchQuery: (q: string) => set(() => ({ searchQuery: q })),
 }));

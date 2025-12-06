@@ -4,12 +4,22 @@ import { useStore } from '../../store/store';
 import { format, subDays, isSameDay } from 'date-fns';
 
 const TicketsChart: React.FC = () => {
-    const { tickets } = useStore();
+    const { tickets, users, searchQuery } = useStore();
 
-    // Generate last 7 days data
+    const normalizedQuery = searchQuery?.trim().toLowerCase() ?? '';
+    const filteredTickets = normalizedQuery
+        ? tickets.filter((t) => {
+              const assigneeName = users.find((u) => u.id === t.assigneeId)?.name ?? '';
+              const creatorName = users.find((u) => u.id === (t as any).createdBy)?.name ?? '';
+              const hay = `${t.title} ${t.description ?? ''} ${t.tags?.join(' ') ?? ''} ${t.id} ${assigneeName} ${creatorName}`.toLowerCase();
+              return hay.includes(normalizedQuery);
+          })
+        : tickets;
+
+    // Generate last 7 days data based on filtered tickets
     const data = Array.from({ length: 7 }).map((_, i) => {
         const date = subDays(new Date(), 6 - i);
-        const count = tickets.filter((t) => isSameDay(new Date(t.createdAt), date)).length;
+        const count = filteredTickets.filter((t) => isSameDay(new Date(t.createdAt), date)).length;
         return {
             name: format(date, 'EEE'),
             tickets: count,

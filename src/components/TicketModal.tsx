@@ -11,7 +11,7 @@ interface TicketModalProps {
 }
 
 const TicketModal: React.FC<TicketModalProps> = ({ isOpen, onClose, ticketId, initialStatus }) => {
-    const { tickets, users, sprints, addTicket, updateTicket } = useStore();
+    const { tickets, users, sprints, addTicket, updateTicket, currentUserId } = useStore();
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [status, setStatus] = useState<Status>(initialStatus || 'backlog');
@@ -36,17 +36,17 @@ const TicketModal: React.FC<TicketModalProps> = ({ isOpen, onClose, ticketId, in
                 setDueDate(ticket.dueDate ? ticket.dueDate.split('T')[0] : '');
             }
         } else {
-            // Reset form
+            // Reset form for new ticket, pre-assign to current user
             setTitle('');
             setDescription('');
             setStatus(initialStatus || 'backlog');
             setPriority('medium');
-            setAssigneeId('');
+            setAssigneeId(currentUserId);
             setSprintId('');
             setTags([]);
             setDueDate('');
         }
-    }, [ticketId, isOpen, tickets, initialStatus]);
+    }, [ticketId, isOpen, tickets, initialStatus, currentUserId]);
 
     if (!isOpen) return null;
 
@@ -60,7 +60,8 @@ const TicketModal: React.FC<TicketModalProps> = ({ isOpen, onClose, ticketId, in
             assigneeId: assigneeId || undefined,
             sprintId: sprintId || undefined,
             tags,
-            dueDate: dueDate ? new Date(dueDate).toISOString() : undefined,
+            // store date as a date-only string YYYY-MM-DD to avoid timezone shifts
+            dueDate: dueDate ? dueDate : undefined,
         };
 
         if (ticketId) {

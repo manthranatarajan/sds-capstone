@@ -2,15 +2,18 @@ import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import type { Ticket } from '../../types';
-import { Calendar, User as UserIcon } from 'lucide-react';
+import { Calendar, User as UserIcon, Edit2, Trash2 } from 'lucide-react';
+import { parseISO, format } from 'date-fns';
 import clsx from 'clsx';
 import { useStore } from '../../store/store';
 
 interface TicketCardProps {
     ticket: Ticket;
+    onEdit?: (ticket: Ticket) => void;
+    onDelete?: (ticketId: string) => void;
 }
 
-const TicketCard: React.FC<TicketCardProps> = ({ ticket }) => {
+const TicketCard: React.FC<TicketCardProps> = ({ ticket, onEdit, onDelete }) => {
     const { users } = useStore();
     const assignee = users.find((u) => u.id === ticket.assigneeId);
 
@@ -59,7 +62,7 @@ const TicketCard: React.FC<TicketCardProps> = ({ ticket }) => {
                 {ticket.dueDate && (
                     <div className="flex items-center text-xs text-gray-500">
                         <Calendar size={12} className="mr-1" />
-                        {new Date(ticket.dueDate).toLocaleDateString()}
+                        {format(parseISO(ticket.dueDate), 'P')}
                     </div>
                 )}
             </div>
@@ -74,9 +77,46 @@ const TicketCard: React.FC<TicketCardProps> = ({ ticket }) => {
                 ))}
             </div>
 
-            <div className="flex justify-between items-center mt-2 pt-2 border-t border-gray-50">
-                <div className="text-xs text-gray-400 font-mono">
-                    {ticket.id}
+            <div className="flex justify-between items-center mt-3 pt-3 border-t border-gray-50">
+                <div className="flex gap-1" style={{ pointerEvents: 'auto' }}>
+                    {onEdit && (
+                        <button
+                            onPointerDown={(e) => {
+                                e.stopPropagation();
+                                e.preventDefault();
+                            }}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                e.preventDefault();
+                                onEdit(ticket);
+                            }}
+                            className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors opacity-0 group-hover:opacity-100"
+                            title="Edit ticket"
+                            type="button"
+                        >
+                            <Edit2 size={14} />
+                        </button>
+                    )}
+                    {onDelete && (
+                        <button
+                            onPointerDown={(e) => {
+                                e.stopPropagation();
+                                e.preventDefault();
+                            }}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                e.preventDefault();
+                                if (window.confirm('Delete this ticket?')) {
+                                    onDelete(ticket.id);
+                                }
+                            }}
+                            className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors opacity-0 group-hover:opacity-100"
+                            title="Delete ticket"
+                            type="button"
+                        >
+                            <Trash2 size={14} />
+                        </button>
+                    )}
                 </div>
                 {assignee ? (
                     <img

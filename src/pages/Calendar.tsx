@@ -7,7 +7,6 @@ import {
     endOfWeek,
     eachDayOfInterval,
     isSameMonth,
-    isSameDay,
     addMonths,
     subMonths,
     isToday
@@ -15,9 +14,10 @@ import {
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from 'lucide-react';
 import { useStore } from '../store/store';
 import clsx from 'clsx';
+import TicketPopover from '../components/TicketPopover';
 
 const Calendar: React.FC = () => {
-    const { tickets } = useStore();
+    const { tickets, users, searchQuery } = useStore();
     const [currentMonth, setCurrentMonth] = useState(new Date());
 
     const nextMonth = () => setCurrentMonth(addMonths(currentMonth, 1));
@@ -33,6 +33,18 @@ const Calendar: React.FC = () => {
         start: startDate,
         end: endDate,
     });
+
+    const [popover, setPopover] = useState<null | { ticket: any; pos: { top: number; left: number } }>(null);
+
+    const normalizedQuery = searchQuery?.trim().toLowerCase() ?? '';
+    const filteredTickets = normalizedQuery
+        ? tickets.filter((t) => {
+              const assigneeName = users.find((u) => u.id === t.assigneeId)?.name ?? '';
+              const creatorName = users.find((u) => u.id === (t as any).createdBy)?.name ?? '';
+              const hay = `${t.title} ${t.description ?? ''} ${t.tags?.join(' ') ?? ''} ${t.id} ${assigneeName} ${creatorName}`.toLowerCase();
+              return hay.includes(normalizedQuery);
+          })
+        : tickets;
 
     const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -68,8 +80,9 @@ const Calendar: React.FC = () => {
 
             <div className="flex-1 grid grid-cols-7 grid-rows-5 md:grid-rows-6">
                 {calendarDays.map((day) => {
-                    const dayTickets = tickets.filter(
-                        (t) => t.dueDate && isSameDay(new Date(t.dueDate), day)
+                    const dayKey = format(day, 'yyyy-MM-dd');
+                    const dayTickets = filteredTickets.filter(
+                        (t) => t.dueDate && t.dueDate === dayKey
                     );
 
                     return (
@@ -95,23 +108,48 @@ const Calendar: React.FC = () => {
                             </div>
 
                             <div className="mt-1 space-y-1 overflow-y-auto max-h-[80px] scrollbar-hide">
-                                {dayTickets.map((ticket) => (
-                                    <div
-                                        key={ticket.id}
-                                        className={clsx(
-                                            'text-xs px-1.5 py-1 rounded border truncate cursor-pointer hover:opacity-80',
-                                            {
-                                                'bg-blue-50 border-blue-100 text-blue-700': ticket.priority === 'low',
-                                                'bg-yellow-50 border-yellow-100 text-yellow-700': ticket.priority === 'medium',
-                                                'bg-red-50 border-red-100 text-red-700': ticket.priority === 'high',
-                                            }
-                                        )}
-                                        title={ticket.title}
-                                    >
-                                        {ticket.title}
-                                    </div>
-                                ))}
+                                                {dayTickets.map((ticket) => (
+                                                    <div
+                                                        key={ticket.id}
+                                                        className={clsx('relative')}
+                                                    >
+                                                        <div
+                                                            className={clsx(
+                                                                'relative text-xs px-1.5 py-1 rounded border truncate cursor-pointer hover:opacity-80',
+                                                                {
+                                                                    'bg-blue-50 border-blue-100 text-blue-700': ticket.priority === 'low',
+                                                                    'bg-yellow-50 border-yellow-100 text-yellow-700': ticket.priority === 'medium',
+                                                                    'bg-red-50 border-red-100 text-red-700': ticket.priority === 'high',
+                                                                }
+                                                            )}
+                                                            title={ticket.title}
+                                                            onMouseEnter={(e) => {
+                                                                const target = e.currentTarget as HTMLElement;
+                                                                const rect = target.getBoundingClientRect();
+                                                                const top = rect.top + window.scrollY;
+                                                                let left = rect.right + window.scrollX + 8;
+                                                                // if popover would go out of viewport, place it to the left
+                                                                const popoverWidth = 320;
+                                                                if (left + popoverWidth > window.innerWidth) {
+                                                                    left = rect.left + window.scrollX - 8 - popoverWidth;
+                                                                }
+                                                                setPopover({ ticket, pos: { top, left } });
+                                                            }}
+                                                            onMouseLeave={() => setPopover(null)}
+                                                        >
+                                                            {ticket.title}
+                                                        </div>
+                                                    </div>
+                                                ))}
                             </div>
+                            {popover && (
+                                <TicketPopover
+                                    ticket={popover.ticket}
+                                    creator={users.find((u) => u.id === popover.ticket.createdBy)}
+                                    pos={popover.pos}
+                                    onClose={() => setPopover(null)}
+                                />
+                            )}
                         </div>
                     );
                 })}
