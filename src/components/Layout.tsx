@@ -6,6 +6,7 @@ import { useStore } from '../store/store';
 import TicketModal from './TicketModal';
 import ProfileDropdown from './ProfileDropdown';
 import AlertsDropdown from './AlertsDropdown';
+import logo from '../assets/sdss.png';
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const { alerts, searchQuery, setSearchQuery } = useStore();
@@ -17,10 +18,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             {/* Sidebar */}
             <aside className="w-64 bg-white border-r border-gray-200 flex flex-col hidden md:flex">
                 <div className="p-6 flex items-center space-x-3 border-b border-gray-100">
-                    <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
-                        <span className="text-white font-bold text-lg">J</span>
-                    </div>
-                    <span className="text-xl font-bold text-gray-800 tracking-tight">JiraLite</span>
+                    <img src={logo} alt="Logo" className="w-8 h-8 rounded-lg" />
+                    <span className="text-xl font-bold text-gray-800 tracking-tight">QC-Lite</span>
                 </div>
 
                 <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
@@ -40,7 +39,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 {/* Top Header */}
                 <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 shadow-sm z-10">
                     <div className="flex items-center md:hidden">
-                        <span className="text-xl font-bold text-gray-800">JiraLite</span>
+                        <span className="text-xl font-bold text-gray-800">QC-Lite</span>
                     </div>
 
                     <div className="flex items-center w-full max-w-md ml-4 hidden md:flex">
