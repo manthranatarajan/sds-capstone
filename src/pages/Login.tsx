@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../store/store';
 import { Lock, Mail, AlertCircle } from 'lucide-react';
+import logo from '../assets/sdss.png';
 
 const Login: React.FC = () => {
     const [username, setUsername] = useState('');
@@ -39,12 +40,10 @@ const Login: React.FC = () => {
             <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
                 {/* Logo */}
                 <div className="flex justify-center mb-8">
-                    <div className="w-12 h-12 bg-indigo-600 rounded-lg flex items-center justify-center">
-                        <span className="text-white font-bold text-2xl">J</span>
-                    </div>
+                    <img src={logo} alt="Logo" className="w-16 h-16 rounded-lg" />
                 </div>
 
-                <h1 className="text-3xl font-bold text-center text-gray-900 mb-2">JiraLite</h1>
+                <h1 className="text-3xl font-bold text-center text-gray-900 mb-2">QC-Lite</h1>
                 <p className="text-center text-gray-500 mb-8">Issue tracking made simple</p>
 
                 {error && (
