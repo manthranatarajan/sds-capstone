@@ -7,7 +7,8 @@ interface AppState {
     sprints: Sprint[];
     alerts: Alert[];
     users: User[];
-    currentUserId: string;
+    currentUserId: string | null;
+    isLoggedIn: boolean;
     searchQuery: string;
 
     // Actions
@@ -23,13 +24,15 @@ interface AppState {
     clearAlert: (id: string) => void;
     setCurrentUser: (userId: string) => void;
     setSearchQuery: (q: string) => void;
+    login: (username: string, password: string) => boolean;
+    logout: () => void;
 }
 
 // Mock Data
 const MOCK_USERS: User[] = [
-    { id: 'u1', name: 'Alice Johnson', avatar: 'https://ui-avatars.com/api/?name=Alice+Johnson' },
-    { id: 'u2', name: 'Bob Smith', avatar: 'https://ui-avatars.com/api/?name=Bob+Smith' },
-    { id: 'u3', name: 'Charlie Brown', avatar: 'https://ui-avatars.com/api/?name=Charlie+Brown' },
+    { id: 'u1', name: 'Alice Johnson', avatar: 'https://ui-avatars.com/api/?name=Alice+Johnson', username: 'alice', password: 'password123' },
+    { id: 'u2', name: 'Bob Smith', avatar: 'https://ui-avatars.com/api/?name=Bob+Smith', username: 'bob', password: 'password123' },
+    { id: 'u3', name: 'Charlie Brown', avatar: 'https://ui-avatars.com/api/?name=Charlie+Brown', username: 'charlie', password: 'password123' },
 ];
 
 const MOCK_SPRINTS: Sprint[] = [
@@ -116,7 +119,8 @@ export const useStore = create<AppState>((set) => ({
     sprints: MOCK_SPRINTS,
     alerts: MOCK_ALERTS,
     users: MOCK_USERS,
-    currentUserId: 'u1',
+    currentUserId: null,
+    isLoggedIn: false,
     searchQuery: '',
 
     addTicket: (ticket) => set((state) => {
@@ -168,4 +172,20 @@ export const useStore = create<AppState>((set) => ({
         currentUserId: userId
     })),
     setSearchQuery: (q: string) => set(() => ({ searchQuery: q })),
+    login: (username, password) => {
+        const user = MOCK_USERS.find(u => u.username === username && u.password === password);
+        if (user) {
+            set(() => ({
+                currentUserId: user.id,
+                isLoggedIn: true
+            }));
+            return true;
+        }
+        return false;
+    },
+    logout: () => set(() => ({
+        currentUserId: null,
+        isLoggedIn: false,
+        searchQuery: ''
+    })),
 }));

@@ -5,6 +5,8 @@ export interface User {
     id: string;
     name: string;
     avatar: string;
+    username?: string;
+    password?: string;
 }
 
 export interface Ticket {
