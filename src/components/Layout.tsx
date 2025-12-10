@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, Outlet } from 'react-router-dom';
 import { LayoutDashboard, KanbanSquare, Calendar, Layers, Settings, Search } from 'lucide-react';
 import clsx from 'clsx';
 import { useStore } from '../store/store';
@@ -8,9 +8,8 @@ import ProfileDropdown from './ProfileDropdown';
 import AlertsDropdown from './AlertsDropdown';
 import logo from '../assets/sdss.png';
 
-const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const { alerts, searchQuery, setSearchQuery } = useStore();
-    const unreadAlerts = alerts.length;
+const Layout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
+    const { searchQuery, setSearchQuery } = useStore();
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     return (
@@ -71,7 +70,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
                 {/* Page Content */}
                 <main className="flex-1 overflow-auto p-6">
-                    {children}
+                    {children || <Outlet />}
                 </main>
 
                 <TicketModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />

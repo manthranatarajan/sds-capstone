@@ -1,12 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { User, LogOut, Settings, HelpCircle } from 'lucide-react';
 import { useStore } from '../store/store';
 
 const ProfileDropdown: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
-    const { users, currentUserId, setCurrentUser } = useStore();
+    const navigate = useNavigate();
+    const { users, currentUserId, setCurrentUser, logout } = useStore();
 
     const user = users.find((u) => u.id === currentUserId);
 
@@ -25,6 +26,12 @@ const ProfileDropdown: React.FC = () => {
     const handleSwitchUser = (userId: string) => {
         setCurrentUser(userId);
         setIsOpen(false);
+    };
+
+    const handleLogout = () => {
+        logout();
+        setIsOpen(false);
+        navigate('/login');
     };
 
     if (!user) return null;
@@ -120,7 +127,7 @@ const ProfileDropdown: React.FC = () => {
                             <span>Help & Support</span>
                         </button>
                         <button
-                            onClick={() => setIsOpen(false)}
+                            onClick={handleLogout}
                             className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-red-600 rounded hover:bg-red-50 transition-colors"
                         >
                             <LogOut size={16} />

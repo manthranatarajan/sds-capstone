@@ -41,7 +41,7 @@ const TicketModal: React.FC<TicketModalProps> = ({ isOpen, onClose, ticketId, in
             setDescription('');
             setStatus(initialStatus || 'backlog');
             setPriority('medium');
-            setAssigneeId(currentUserId);
+            setAssigneeId(currentUserId || '');
             setSprintId('');
             setTags([]);
             setDueDate('');
